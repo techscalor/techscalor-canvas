@@ -5,12 +5,18 @@ import {
   Layers, Database, Boxes, Palette, Wrench, GitBranch, Bot, ServerCog,
   LineChart, ShieldCheck, Zap, Rocket, CheckCircle2, Star, Github, Linkedin,
   Mail, ExternalLink, Search, MessageSquare, Compass, PenTool, TestTube2,
-  Send, Package, HeartHandshake, Users, MapPin, Phone, ChevronDown,
+  Send, Package, HeartHandshake, Users, MapPin, Phone, ChevronDown,Instagram
 } from "lucide-react";
 import { useState as useReactState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import heroVisual from "@/assets/hero-visual.jpg";
+import Jawad from '../../assets/team/jawad.png'
+import Subhan from '../../assets/team/Subhan.jpg'
+import Qayoom from '../../assets/team/qayoom.jpg'
+import Asad from '../../assets/team/asad.png'
+import Umair from '../../assets/team/umair.png'
+
 
 /* ---------------- Counter ---------------- */
 function Counter({ to, suffix = "", duration = 1.6 }: { to: number; suffix?: string; duration?: number }) {
@@ -289,7 +295,7 @@ const SERVICES = [
   { icon: Bot, t: "AI Solutions", d: "LLM apps, computer vision, and predictive systems in production." },
   { icon: Layers, t: "SaaS Development", d: "Multi-tenant platforms with billing, auth, and analytics from day one." },
   { icon: ShoppingCart, t: "eCommerce", d: "High-converting stores on Shopify, Medusa, and custom stacks." },
-  { icon: Smartphone, t: "Mobile Apps", d: "React Native and Flutter apps for iOS and Android." },
+  { icon: Smartphone, t: "Mobile Apps", d: "React Native apps for iOS and Android." },
   { icon: Cloud, t: "Cloud Solutions", d: "AWS, GCP, and Azure architecture built for scale and cost-efficiency." },
   { icon: Wrench, t: "API Integration", d: "Bulletproof integrations with Stripe, Twilio, Salesforce, and beyond." },
   { icon: Database, t: "ERP Systems", d: "Streamline operations with tailored ERP built for your industry." },
@@ -431,7 +437,7 @@ export function Projects() {
                 </a>
                 {p.github && (
                   <a href={p.github} target="_blank" rel="noopener noreferrer" className="grid h-7 w-7 place-items-center rounded-full border border-border">
-                    <Github className="h-3.5 w-3.5" />
+                    <Instagram className="h-3.5 w-3.5" />
                   </a>
                 )}
               </div>
@@ -448,7 +454,7 @@ export function Projects() {
 }
 
 /* ---------------- TECH ---------------- */
-const TECHS = ["React", "Next.js", "Vue", "Node.js", "Express", "Laravel", "PHP", "Python", "Django", "FastAPI", "Java", "Spring Boot", "Flutter", "React Native", "Supabase", "Firebase", "PostgreSQL", "MongoDB", "MySQL", "Docker", "Kubernetes", "AWS", "Azure", "Google Cloud", "Vercel", "Cloudflare", "GitHub", "OpenAI", "Stripe"];
+const TECHS = ["React", "Next.js", "Vue", "Node.js", "Express", "Python", "Django", "FastAPI", "React Native", "Supabase", "Firebase", "PostgreSQL", "MongoDB", "MySQL", "Docker", "Kubernetes", "AWS", "Azure", "Google Cloud", "Vercel", "Cloudflare", "GitHub", "OpenAI", "Stripe", "Claude"];
 export function Technologies() {
   return (
     <Section id="tech">
@@ -535,11 +541,11 @@ export function WhyUs() {
 
 /* ---------------- TEAM ---------------- */
 const TEAM_REAL = [
-  { name: "Jawad Ali", role: "CEO • Senior Full Stack Engineer", initials: "JA", grad: "from-blue-500 to-cyan-400" },
-  { name: "Subhan", role: "Senior Full Stack Engineer", initials: "SU", grad: "from-purple-500 to-pink-500" },
-  { name: "Muhammad Ahsan", role: "Python / AI Engineer", initials: "MA", grad: "from-emerald-500 to-teal-400" },
-  { name: "Qayoom Ali", role: "Graphic Designer", initials: "QA", grad: "from-amber-500 to-orange-500" },
-  { name: "Jabi Ul Hassan", role: "Sales Manager", initials: "JH", grad: "from-rose-500 to-red-500" },
+  { name: "Jawad Ali", role: "CEO • Senior Full Stack Engineer", initials: "JA", grad: "from-blue-500 to-cyan-400", img:Jawad },
+  { name: "Subhan", role: "Senior Full Stack Engineer", initials: "SU", grad: "from-purple-500 to-pink-500", img:Subhan },
+  { name: "Muhammad Umair", role: "Digital Marketer", initials: "MA", grad: "from-emerald-500 to-teal-400", img:Umair },
+  { name: "Qayoom Ali", role: "Graphic Designer", initials: "QA", grad: "from-amber-500 to-orange-500", img:Qayoom },
+  { name: "Asad Butt", role: "Python / AI Engineer", initials: "JH", grad: "from-rose-500 to-red-500", img:Asad },
 ];
 const TEAM_MORE = [
   { name: "Ayesha Khan", role: "Frontend Developer", initials: "AK", grad: "from-sky-500 to-indigo-500" },
@@ -556,25 +562,74 @@ const TEAM_MORE = [
   { name: "Ethan Park", role: "Customer Success Manager", initials: "EP", grad: "from-sky-500 to-indigo-500" },
 ];
 
-function TeamCard({ p }: { p: { name: string; role: string; initials: string; grad: string } }) {
+function TeamCard({ p }: { p: TeamMember }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="group rounded-2xl border border-border bg-card overflow-hidden shadow-card hover:shadow-elevated hover:-translate-y-1 transition-all"
+      className="group overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all hover:-translate-y-1 hover:shadow-elevated"
     >
-      <div className={`aspect-square bg-gradient-to-br ${p.grad} relative grid place-items-center`}>
-        <div className="text-5xl font-black text-white/90">{p.initials}</div>
-        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/40 to-transparent" />
+      <div className="relative aspect-square overflow-hidden">
+        {p.img ? (
+          <img
+            src={p.img}
+            alt={p.name}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div
+            className={`grid h-full w-full place-items-center bg-gradient-to-br ${p.grad}`}
+          >
+            <div className="text-5xl font-black text-white/90">
+              {p.initials}
+            </div>
+          </div>
+        )}
+
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" />
       </div>
+
       <div className="p-5">
-        <div className="font-semibold text-foreground">{p.name}</div>
-        <div className="text-sm text-muted-foreground">{p.role}</div>
-        <div className="mt-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <a href="#" aria-label="LinkedIn" className="grid h-8 w-8 place-items-center rounded-full border border-border hover:bg-muted"><Linkedin className="h-3.5 w-3.5" /></a>
-          <a href="#" aria-label="GitHub" className="grid h-8 w-8 place-items-center rounded-full border border-border hover:bg-muted"><Github className="h-3.5 w-3.5" /></a>
-          <a href="mailto:info@techscalor.com" aria-label="Email" className="grid h-8 w-8 place-items-center rounded-full border border-border hover:bg-muted"><Mail className="h-3.5 w-3.5" /></a>
+        <h3 className="font-semibold text-foreground">{p.name}</h3>
+
+        <p className="text-sm text-muted-foreground">
+          {p.role}
+        </p>
+
+        <div className="mt-4 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+          {p.linkedin && (
+            <a
+              href={p.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
+              className="grid h-9 w-9 place-items-center rounded-full border border-border hover:bg-muted"
+            >
+              <Linkedin className="h-4 w-4" />
+            </a>
+          )}
+
+          {p.github && (
+            <a
+              href={p.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="GitHub"
+              className="grid h-9 w-9 place-items-center rounded-full border border-border hover:bg-muted"
+            >
+              <Instagram className="h-4 w-4" />
+            </a>
+          )}
+
+          <a
+            href={`mailto:${p.email ?? "info@techscalor.com"}`}
+            aria-label="Email"
+            className="grid h-9 w-9 place-items-center rounded-full border border-border hover:bg-muted"
+          >
+            <Mail className="h-4 w-4" />
+          </a>
         </div>
       </div>
     </motion.div>
@@ -585,7 +640,10 @@ export function Team() {
     <Section id="team" className="bg-muted/40">
       <Heading eyebrow="Our Team" title={<>The people <span className="text-gradient-brand">behind the work</span></>} subtitle="A distributed team of engineers, designers, and strategists shipping across time zones." />
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        {[...TEAM_REAL, ...TEAM_MORE].map((p) => (
+        {/* {[...TEAM_REAL, ...TEAM_MORE].map((p) => (
+          <TeamCard key={p.name} p={p} />
+        ))} */}
+        {[...TEAM_REAL].map((p) => (
           <TeamCard key={p.name} p={p} />
         ))}
       </div>
@@ -748,13 +806,13 @@ export function Contact() {
                 <a href="mailto:info@techscalor.com" className="font-semibold text-foreground hover:underline">info@techscalor.com</a>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            {/* <div className="flex items-center gap-3">
               <div className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-brand text-white shadow-glow"><Phone className="h-5 w-5" /></div>
               <div>
                 <div className="text-xs text-muted-foreground">WhatsApp</div>
                 <a href="https://wa.me/923296121520" target="_blank" rel="noopener noreferrer" className="font-semibold text-foreground hover:underline">+92 329 6121520</a>
               </div>
-            </div>
+            </div> */}
             <div className="flex items-center gap-3">
               <div className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-brand text-white shadow-glow"><MapPin className="h-5 w-5" /></div>
               <div>
@@ -833,7 +891,7 @@ export function Footer() {
             <p className="mt-3 text-sm text-muted-foreground max-w-sm">Building modern websites, AI solutions, SaaS platforms, mobile apps, and custom software that scale.</p>
             <div className="mt-4 flex gap-2">
               <a href="#" aria-label="LinkedIn" className="grid h-9 w-9 place-items-center rounded-full border border-border hover:bg-muted"><Linkedin className="h-4 w-4" /></a>
-              <a href="#" aria-label="GitHub" className="grid h-9 w-9 place-items-center rounded-full border border-border hover:bg-muted"><Github className="h-4 w-4" /></a>
+              <a href="#" aria-label="GitHub" className="grid h-9 w-9 place-items-center rounded-full border border-border hover:bg-muted"><Instagram className="h-4 w-4" /></a>
               <a href="mailto:info@techscalor.com" aria-label="Email" className="grid h-9 w-9 place-items-center rounded-full border border-border hover:bg-muted"><Mail className="h-4 w-4" /></a>
             </div>
           </div>
