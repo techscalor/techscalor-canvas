@@ -1,24 +1,50 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Navbar } from "@/components/site/Navbar";
+import { FloatingButtons } from "@/components/site/FloatingButtons";
+import { CookieConsent } from "@/components/site/CookieConsent";
+import {
+  Hero, About, Services, Projects, Technologies, Process, WhyUs, Team, Reviews, Faq, Contact, Newsletter, Footer,
+} from "@/components/site/Sections";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "TechScalor — Building Technology That Scales" },
+      { name: "description", content: "TechScalor builds modern websites, AI solutions, SaaS platforms, mobile apps, cloud systems, and custom software for startups and enterprises worldwide." },
+      { property: "og:title", content: "TechScalor — Building Technology That Scales" },
+      { property: "og:description", content: "Custom software, AI, SaaS, mobile, and cloud solutions engineered for growth." },
+      { property: "og:url", content: "/" },
+      { property: "og:image", content: "/og-image.jpg" },
+      { name: "twitter:image", content: "/og-image.jpg" },
+      { name: "twitter:title", content: "TechScalor — Building Technology That Scales" },
+      { name: "twitter:description", content: "Custom software, AI, SaaS, mobile, and cloud solutions engineered for growth." },
+    ],
+    links: [{ rel: "canonical", href: "/" }],
+  }),
+  component: Landing,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Landing() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-dvh bg-background text-foreground overflow-x-hidden">
+      <Navbar />
+      <main>
+        <Hero />
+        <About />
+        <Services />
+        <Projects />
+        <Technologies />
+        <Process />
+        <WhyUs />
+        <Team />
+        <Reviews />
+        <Faq />
+        <Contact />
+        <Newsletter />
+      </main>
+      <Footer />
+      <FloatingButtons />
+      <CookieConsent />
     </div>
   );
 }
