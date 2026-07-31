@@ -10,6 +10,8 @@ export type Project = {
   id: string;
   title: string;
   category: string;
+  /** optional folder hint, e.g. "agency/p1" — images live in public/projects/<folder>/ */
+  folder?: string;
   date: string;
   clientName: string;
   clientCountry: string;
@@ -22,6 +24,43 @@ export type Project = {
 
 const PROJECTS = projectsData as Project[];
 const CATEGORIES = ["All", ...Array.from(new Set(PROJECTS.map((p) => p.category)))];
+
+/** In-memory cache so an image is only decoded/fetched once per session. */
+const imgCache = new Set<string>();
+function preload(src?: string) {
+  if (!src || typeof window === "undefined" || imgCache.has(src)) return;
+  const img = new Image();
+  img.decoding = "async";
+  img.src = src;
+  imgCache.add(src);
+}
+
+function SmartImage({
+  src,
+  alt,
+  className,
+  eager,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  eager?: boolean;
+}) {
+  const [loaded, setLoaded] = useState(() => imgCache.has(src));
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading={eager ? "eager" : "lazy"}
+      decoding="async"
+      onLoad={() => {
+        imgCache.add(src);
+        setLoaded(true);
+      }}
+      className={`${className ?? ""} transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
+    />
+  );
+}
 
 function formatDate(d: string) {
   const date = new Date(d);
@@ -36,6 +75,14 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
   const [i, setI] = useState(0);
   const next = () => setI((v) => (v + 1) % slides.length);
   const prev = () => setI((v) => (v - 1 + slides.length) % slides.length);
+
+  // Warm the neighbouring slides so navigation is instant.
+  useEffect(() => {
+    preload(slides[(i + 1) % slides.length]);
+    preload(slides[(i - 1 + slides.length) % slides.length]);
+  }, [i, slides]);
+
+
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -129,7 +176,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
                 onClick={() => setI(idx)}
                 className={`h-14 w-24 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${idx === i ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"}`}
               >
-                <img src={s} alt="" className="h-full w-full object-cover object-top" />
+                <img src={s} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover object-top" />
               </button>
             ))}
           </div>
@@ -255,11 +302,11 @@ export function Projects() {
               className="group cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all hover:-translate-y-1 hover:shadow-elevated"
             >
               <div className="relative aspect-[16/10] overflow-hidden bg-muted">
-                <img
+                <SmartImage
                   src={p.featureImage}
                   alt={p.title}
-                  loading="lazy"
-                  className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                  eager={i < 3}
+                  className="h-full w-full object-cover object-top duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                 <div className="absolute inset-x-0 bottom-0 translate-y-3 p-4 opacity-0 transition-all group-hover:translate-y-0 group-hover:opacity-100">
