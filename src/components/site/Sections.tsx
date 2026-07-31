@@ -776,7 +776,10 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid md:grid-cols-4 gap-10">
           <div className="md:col-span-2">
-            <div className="text-2xl font-bold text-gradient-brand">TechScalor</div>
+            <div className="flex items-center gap-2.5">
+              <img src={logoAsset.url} alt="TechScalor logo" className="h-9 w-9 object-contain" width={36} height={36} />
+              <span className="text-2xl font-bold text-gradient-brand">TechScalor</span>
+            </div>
             <p className="mt-3 text-sm text-muted-foreground max-w-sm">Building modern websites, AI solutions, SaaS platforms, mobile apps, and custom software that scale.</p>
             <div className="mt-4 flex gap-2">
               <a href="#" aria-label="LinkedIn" className="grid h-9 w-9 place-items-center rounded-full border border-border hover:bg-muted"><Linkedin className="h-4 w-4" /></a>
