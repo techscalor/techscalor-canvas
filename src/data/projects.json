@@ -1,0 +1,15 @@
+[
+  {
+    "id": "fulfillneeds",
+    "title": "FulfillNeeds — Marketing Agency Platform",
+    "category": "Websites",
+    "date": "2024-11-23",
+    "clientName": "FulfillNeeds",
+    "clientCountry": "United States",
+    "description": "A complete marketing agency website built with Next.js — a bold hero, service catalogue, filterable project showcase, an about section with video, a weekly-updated blog, and a validated contact experience. Optimised for Core Web Vitals, fully responsive, and SEO-ready.",
+    "tech": ["Next.js", "React", "TypeScript", "Tailwind CSS", "Node.js", "Vercel"],
+    "url": "https://example.com",
+    "featureImage": "/__l5e/assets-v1/PLACEHOLDER/fulfillneeds-110337.png",
+    "images": []
+  }
+]
