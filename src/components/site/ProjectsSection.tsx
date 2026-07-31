@@ -10,6 +10,8 @@ export type Project = {
   id: string;
   title: string;
   category: string;
+  /** optional folder hint, e.g. "agency/p1" — images live in public/projects/<folder>/ */
+  folder?: string;
   date: string;
   clientName: string;
   clientCountry: string;
@@ -22,6 +24,43 @@ export type Project = {
 
 const PROJECTS = projectsData as Project[];
 const CATEGORIES = ["All", ...Array.from(new Set(PROJECTS.map((p) => p.category)))];
+
+/** In-memory cache so an image is only decoded/fetched once per session. */
+const imgCache = new Set<string>();
+function preload(src?: string) {
+  if (!src || typeof window === "undefined" || imgCache.has(src)) return;
+  const img = new Image();
+  img.decoding = "async";
+  img.src = src;
+  imgCache.add(src);
+}
+
+function SmartImage({
+  src,
+  alt,
+  className,
+  eager,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  eager?: boolean;
+}) {
+  const [loaded, setLoaded] = useState(() => imgCache.has(src));
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading={eager ? "eager" : "lazy"}
+      decoding="async"
+      onLoad={() => {
+        imgCache.add(src);
+        setLoaded(true);
+      }}
+      className={`${className ?? ""} transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
+    />
+  );
+}
 
 function formatDate(d: string) {
   const date = new Date(d);
