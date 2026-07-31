@@ -562,7 +562,7 @@ const TEAM_MORE = [
   { name: "Ethan Park", role: "Customer Success Manager", initials: "EP", grad: "from-sky-500 to-indigo-500" },
 ];
 
-type TeamMember = { name: string; role: string; initials: string; grad: string; img?: string };
+type TeamMember = { name: string; role: string; initials: string; grad: string; img?: string; linkedin?: string; github?: string; email?: string };
 
 function TeamCard({ p }: { p: TeamMember }) {
   return (
