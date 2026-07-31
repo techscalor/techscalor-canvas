@@ -430,7 +430,7 @@ export function WhyUs() {
 /* ---------------- TEAM ---------------- */
 const TEAM_REAL = [
   { name: "Jawad Ali", role: "CEO • Senior Full Stack Engineer", initials: "JA", grad: "from-blue-500 to-cyan-400", img:Jawad },
-  { name: "Subhan", role: "Senior Full Stack Engineer", initials: "SU", grad: "from-purple-500 to-pink-500", img:Subhan },
+  { name: "Subhan", role: "Mobile App Developer", initials: "SU", grad: "from-purple-500 to-pink-500", img:Subhan },
   { name: "Muhammad Umair", role: "Digital Marketer", initials: "MA", grad: "from-emerald-500 to-teal-400", img:Umair },
   { name: "Qayoom Ali", role: "Graphic Designer", initials: "QA", grad: "from-amber-500 to-orange-500", img:Qayoom },
   { name: "Asad Butt", role: "Python / AI Engineer", initials: "JH", grad: "from-rose-500 to-red-500", img:Asad },
