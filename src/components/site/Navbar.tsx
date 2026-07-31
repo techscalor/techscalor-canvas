@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Menu, X, ArrowRight } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logoAsset from "@/assets/techscalor-logo.png.asset.json";
 
 const NAV = [
   { label: "Home", href: "#home" },
