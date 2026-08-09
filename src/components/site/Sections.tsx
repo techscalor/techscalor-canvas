@@ -11,7 +11,7 @@ import { useState as useReactState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import heroVisual from "@/assets/hero-visual.jpg";
-import logoAsset from "@/assets/techscalor-logo.png.asset.json";
+import { supabase } from "@/lib/supabase";
 import Jawad from '../../assets/team/jawad.png'
 import Subhan from '../../assets/team/Subhan.jpg'
 import Qayoom from '../../assets/team/qayoom.jpg'
@@ -651,7 +651,8 @@ export function Contact() {
   const [loading, setLoading] = useReactState(false);
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
+    const formEl = e.currentTarget;
+    const fd = new FormData(formEl);
     const data = Object.fromEntries(fd.entries());
     const res = contactSchema.safeParse(data);
     if (!res.success) {
@@ -659,11 +660,25 @@ export function Contact() {
       return;
     }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 900));
+    const v = res.data;
+    const { error } = await supabase.from("contact_messages").insert({
+      name: v.name,
+      email: v.email,
+      company: (v.company || null) as string | null,
+      budget: [v.budget, v.service].filter(Boolean).join(" · ") || null,
+      message: [v.message, v.phone ? `Phone: ${v.phone}` : "", v.country ? `Country: ${v.country}` : ""]
+        .filter(Boolean)
+        .join("\n"),
+    });
     setLoading(false);
+    if (error) {
+      toast.error("Could not send your message. Please try again.");
+      return;
+    }
     toast.success("Thanks! We'll be in touch within 24 hours.");
-    e.currentTarget.reset();
+    formEl.reset();
   };
+
   return (
     <Section id="contact">
       <Heading eyebrow="Get in touch" title={<>Let's build <span className="text-gradient-brand">something great</span></>} subtitle="Tell us about your project. We reply within 24 hours." />
@@ -747,13 +762,20 @@ function SelectField({ label, name, options }: { label: string; name: string; op
 
 /* ---------------- NEWSLETTER + FOOTER ---------------- */
 export function Newsletter() {
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const email = (new FormData(e.currentTarget).get("email") as string) ?? "";
+    const formEl = e.currentTarget;
+    const email = ((new FormData(formEl).get("email") as string) ?? "").trim().slice(0, 255);
     if (!/^\S+@\S+\.\S+$/.test(email)) { toast.error("Please enter a valid email"); return; }
+    const { error } = await supabase.from("newsletter_subscribers").insert({ email });
+    if (error && !error.message.includes("duplicate")) {
+      toast.error("Subscription failed. Please try again.");
+      return;
+    }
     toast.success("You're subscribed!");
-    e.currentTarget.reset();
+    formEl.reset();
   };
+
   return (
     <Section className="py-16">
       <div className="rounded-3xl bg-gradient-brand p-10 sm:p-14 text-center shadow-elevated relative overflow-hidden">
@@ -778,7 +800,7 @@ export function Footer() {
         <div className="grid md:grid-cols-4 gap-10">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5">
-              <img src={logoAsset.url} alt="TechScalor logo" className="h-9 w-9 object-contain" width={36} height={36} />
+              <img src="/logo.png" alt="TechScalor logo" className="h-9 w-9 object-contain" width={36} height={36} />
               <span className="text-2xl font-bold text-gradient-brand">TechScalor</span>
             </div>
             <p className="mt-3 text-sm text-muted-foreground max-w-sm">Building modern websites, AI solutions, SaaS platforms, mobile apps, and custom software that scale.</p>
