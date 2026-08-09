@@ -651,7 +651,8 @@ export function Contact() {
   const [loading, setLoading] = useReactState(false);
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
+    const formEl = e.currentTarget;
+    const fd = new FormData(formEl);
     const data = Object.fromEntries(fd.entries());
     const res = contactSchema.safeParse(data);
     if (!res.success) {
@@ -659,11 +660,25 @@ export function Contact() {
       return;
     }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 900));
+    const v = res.data;
+    const { error } = await supabase.from("contact_messages").insert({
+      name: v.name,
+      email: v.email,
+      company: (v.company || null) as string | null,
+      budget: [v.budget, v.service].filter(Boolean).join(" · ") || null,
+      message: [v.message, v.phone ? `Phone: ${v.phone}` : "", v.country ? `Country: ${v.country}` : ""]
+        .filter(Boolean)
+        .join("\n"),
+    });
     setLoading(false);
+    if (error) {
+      toast.error("Could not send your message. Please try again.");
+      return;
+    }
     toast.success("Thanks! We'll be in touch within 24 hours.");
-    e.currentTarget.reset();
+    formEl.reset();
   };
+
   return (
     <Section id="contact">
       <Heading eyebrow="Get in touch" title={<>Let's build <span className="text-gradient-brand">something great</span></>} subtitle="Tell us about your project. We reply within 24 hours." />
