@@ -18,6 +18,8 @@ const NAV = [
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { user, isAdmin } = useAuth();
+
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
