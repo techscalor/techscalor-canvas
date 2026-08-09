@@ -58,6 +58,23 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
+          {user ? (
+            isAdmin ? (
+              <Link
+                to="/admin"
+                className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted"
+              >
+                <LayoutDashboard className="h-4 w-4" /> Admin
+              </Link>
+            ) : null
+          ) : (
+            <Link
+              to="/auth"
+              className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted"
+            >
+              <LogIn className="h-4 w-4" /> Login
+            </Link>
+          )}
           <a
             href="#contact"
             className="hidden md:inline-flex items-center gap-1.5 rounded-full bg-gradient-brand px-5 py-2.5 text-sm font-semibold text-white shadow-glow transition-transform hover:scale-105"
@@ -65,6 +82,7 @@ export function Navbar() {
             Get Free Quote
             <ArrowRight className="h-4 w-4" />
           </a>
+
           <button
             onClick={() => setOpen((v) => !v)}
             className="inline-flex lg:hidden h-10 w-10 items-center justify-center rounded-full border border-border bg-background/80"
