@@ -762,13 +762,20 @@ function SelectField({ label, name, options }: { label: string; name: string; op
 
 /* ---------------- NEWSLETTER + FOOTER ---------------- */
 export function Newsletter() {
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const email = (new FormData(e.currentTarget).get("email") as string) ?? "";
+    const formEl = e.currentTarget;
+    const email = ((new FormData(formEl).get("email") as string) ?? "").trim().slice(0, 255);
     if (!/^\S+@\S+\.\S+$/.test(email)) { toast.error("Please enter a valid email"); return; }
+    const { error } = await supabase.from("newsletter_subscribers").insert({ email });
+    if (error && !error.message.includes("duplicate")) {
+      toast.error("Subscription failed. Please try again.");
+      return;
+    }
     toast.success("You're subscribed!");
-    e.currentTarget.reset();
+    formEl.reset();
   };
+
   return (
     <Section className="py-16">
       <div className="rounded-3xl bg-gradient-brand p-10 sm:p-14 text-center shadow-elevated relative overflow-hidden">
