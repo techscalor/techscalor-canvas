@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Menu, X, ArrowRight } from "lucide-react";
-import logoAsset from "@/assets/techscalor-logo.png.asset.json";
 
 const NAV = [
   { label: "Home", href: "#home" },
@@ -37,7 +36,7 @@ export function Navbar() {
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <a href="#home" className="flex items-center gap-2.5 shrink-0">
-          <img src={logoAsset.url} alt="TechScalor logo" className="h-9 w-9 object-contain" width={36} height={36} />
+          <img src="/logo.png" alt="TechScalor logo" className="h-9 w-9 object-contain" width={36} height={36} />
           <span className="text-xl font-bold tracking-tight text-gradient-brand">TechScalor</span>
         </a>
 

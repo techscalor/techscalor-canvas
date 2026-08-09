@@ -800,7 +800,7 @@ export function Footer() {
         <div className="grid md:grid-cols-4 gap-10">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5">
-              <img src={logoAsset.url} alt="TechScalor logo" className="h-9 w-9 object-contain" width={36} height={36} />
+              <img src="/logo.png" alt="TechScalor logo" className="h-9 w-9 object-contain" width={36} height={36} />
               <span className="text-2xl font-bold text-gradient-brand">TechScalor</span>
             </div>
             <p className="mt-3 text-sm text-muted-foreground max-w-sm">Building modern websites, AI solutions, SaaS platforms, mobile apps, and custom software that scale.</p>
