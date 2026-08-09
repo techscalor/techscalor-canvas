@@ -11,7 +11,7 @@ import { useState as useReactState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import heroVisual from "@/assets/hero-visual.jpg";
-import logoAsset from "@/assets/techscalor-logo.png.asset.json";
+import { supabase } from "@/lib/supabase";
 import Jawad from '../../assets/team/jawad.png'
 import Subhan from '../../assets/team/Subhan.jpg'
 import Qayoom from '../../assets/team/qayoom.jpg'
