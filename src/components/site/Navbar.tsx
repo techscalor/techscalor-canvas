@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X, ArrowRight, LogIn, LayoutDashboard } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { useAuth } from "@/lib/auth";
+
 
 const NAV = [
   { label: "Home", href: "#home" },
