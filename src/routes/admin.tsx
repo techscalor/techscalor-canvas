@@ -261,6 +261,13 @@ function ProjectForm({ value, onClose, onSaved }: { value: FormState; onClose: (
   const [f, setF] = useState<FormState>(value);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [cats, setCats] = useState<Category[]>([]);
+
+  useEffect(() => {
+    void fetchCategories({ includeDisabled: true }).then(setCats).catch(() => setCats([]));
+  }, []);
+
+
 
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setF((p) => ({ ...p, [k]: v }));
 
