@@ -329,9 +329,50 @@ function ProjectForm({ value, onClose, onSaved }: { value: FormState; onClose: (
             <input id="p-title" className={input} value={f.title} maxLength={200} onChange={(e) => set("title", e.target.value)} required />
           </div>
           <div>
-            <label className={label} htmlFor="p-cat">Category</label>
-            <input id="p-cat" className={input} value={f.category} maxLength={60} onChange={(e) => set("category", e.target.value)} placeholder="Web, SaaS, Mobile…" />
+            <label className={label} htmlFor="p-cat">Category (platform)</label>
+            <select id="p-cat" className={input} value={f.category} onChange={(e) => set("category", e.target.value)}>
+              <option value="">Select category…</option>
+              {cats.map((c) => (
+                <option key={c.id} value={c.name}>{c.name}{c.enabled ? "" : " (hidden)"}</option>
+              ))}
+              {f.category && !cats.some((c) => c.name === f.category) && <option value={f.category}>{f.category}</option>}
+            </select>
           </div>
+          <div>
+            <label className={label} htmlFor="p-status">Status</label>
+            <select id="p-status" className={input} value={f.status} onChange={(e) => set("status", e.target.value)}>
+              <option value="">No status</option>
+              {STATUS_OPTIONS.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
+          <div className="sm:col-span-2">
+            <span className={label}>Contributions (TechScalor's role)</span>
+            <div className="flex flex-wrap gap-2">
+              {CONTRIBUTION_OPTIONS.map((c) => {
+                const on = f.contributions.includes(c);
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() =>
+                      setF((p) => ({
+                        ...p,
+                        contributions: on ? p.contributions.filter((x) => x !== c) : [...p.contributions, c],
+                      }))
+                    }
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      on ? "border-transparent bg-gradient-brand text-white" : "border-border text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {c}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div>
             <label className={label} htmlFor="p-date">Date</label>
             <input id="p-date" type="date" className={input} value={f.project_date} onChange={(e) => set("project_date", e.target.value)} />
