@@ -274,17 +274,32 @@ export function Projects() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const projects = data ?? [];
-  const categories = ["All", ...Array.from(new Set(projects.map((p) => p.category)))];
+  const { data: catData } = useQuery({
+    queryKey: ["categories", "enabled"],
+    queryFn: () => fetchCategories(),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const allProjects = data ?? [];
+  const enabled = catData?.map((c) => c.name) ?? null;
+  // Projects in a disabled (or deleted) category are hidden from the public site.
+  const projects = enabled ? allProjects.filter((p) => enabled.includes(p.category)) : allProjects;
+  const categories = [
+    "All",
+    ...(enabled ?? Array.from(new Set(allProjects.map((p) => p.category)))).filter((c) =>
+      projects.some((p) => p.category === c)
+    ),
+  ];
 
   const list = projects.filter(
     (p) =>
       (cat === "All" || p.category === cat) &&
       (q.trim() === "" ||
-        (p.title + p.description + (p.client_name ?? "") + p.languages.join(" "))
+        (p.title + p.description + (p.client_name ?? "") + p.languages.join(" ") + (p.status ?? "") + (p.contributions ?? []).join(" "))
           .toLowerCase()
           .includes(q.toLowerCase()))
   );
+
 
   return (
     <section id="projects" className="relative bg-muted/40 py-24 sm:py-32">
