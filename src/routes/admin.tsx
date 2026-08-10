@@ -137,6 +137,7 @@ function AdminPage() {
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
         {tab === "projects" && <ProjectsAdmin />}
+        {tab === "categories" && <CategoriesAdmin />}
         {tab === "messages" && <SimpleTable table="contact_messages" columns={["created_at", "name", "email", "company", "budget", "message"]} />}
         {tab === "subscribers" && <SimpleTable table="newsletter_subscribers" columns={["created_at", "email"]} />}
       </main>
