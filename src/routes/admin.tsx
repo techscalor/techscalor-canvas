@@ -1,10 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2, Pencil, LogOut, X, Upload, Mail, Users } from "lucide-react";
+import { Loader2, Plus, Trash2, Pencil, LogOut, X, Upload, Mail, Users, Tags } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
-import { fetchProjects, imageUrl, uploadProjectImage, type Project } from "@/lib/projects";
+import { fetchProjects, imageUrl, uploadProjectImage, CONTRIBUTION_OPTIONS, STATUS_OPTIONS, type Project } from "@/lib/projects";
+import { fetchCategories, type Category } from "@/lib/categories";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
