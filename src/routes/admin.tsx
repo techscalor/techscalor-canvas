@@ -25,6 +25,8 @@ type FormState = {
   id?: string;
   title: string;
   category: string;
+  status: string;
+  contributions: string[];
   description: string;
   author: string;
   client_name: string;
@@ -40,7 +42,9 @@ type FormState = {
 
 const empty: FormState = {
   title: "",
-  category: "Web",
+  category: "",
+  status: "",
+  contributions: [],
   description: "",
   author: "",
   client_name: "",
