@@ -6,6 +6,7 @@ import {
   Calendar, User, MapPin, Loader2, PenLine,
 } from "lucide-react";
 import { fetchProjects, imageUrl, type Project } from "@/lib/projects";
+import { fetchCategories } from "@/lib/categories";
 
 /** In-memory cache so an image is only decoded/fetched once per session. */
 const imgCache = new Set<string>();
@@ -171,11 +172,31 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
         {/* Overview */}
         <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-              {project.category}
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                {project.category}
+              </span>
+              {project.status && (
+                <span className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">
+                  {project.status}
+                </span>
+              )}
+            </div>
             <h3 className="mt-3 text-2xl font-bold text-foreground sm:text-3xl">{project.title}</h3>
+            {project.contributions?.length > 0 && (
+              <div className="mt-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Our contribution</p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {project.contributions.map((c) => (
+                    <span key={c} className="rounded-full border border-border bg-muted/60 px-2.5 py-1 text-[11px] font-semibold text-foreground">
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
             <p className="mt-4 whitespace-pre-line text-muted-foreground">{project.description}</p>
+
             {project.languages.length > 0 && (
               <div className="mt-5 flex flex-wrap gap-1.5">
                 {project.languages.map((t) => (
@@ -253,17 +274,32 @@ export function Projects() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const projects = data ?? [];
-  const categories = ["All", ...Array.from(new Set(projects.map((p) => p.category)))];
+  const { data: catData } = useQuery({
+    queryKey: ["categories", "enabled"],
+    queryFn: () => fetchCategories(),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const allProjects = data ?? [];
+  const enabled = catData?.map((c) => c.name) ?? null;
+  // Projects in a disabled (or deleted) category are hidden from the public site.
+  const projects = enabled ? allProjects.filter((p) => enabled.includes(p.category)) : allProjects;
+  const categories = [
+    "All",
+    ...(enabled ?? Array.from(new Set(allProjects.map((p) => p.category)))).filter((c) =>
+      projects.some((p) => p.category === c)
+    ),
+  ];
 
   const list = projects.filter(
     (p) =>
       (cat === "All" || p.category === cat) &&
       (q.trim() === "" ||
-        (p.title + p.description + (p.client_name ?? "") + p.languages.join(" "))
+        (p.title + p.description + (p.client_name ?? "") + p.languages.join(" ") + (p.status ?? "") + (p.contributions ?? []).join(" "))
           .toLowerCase()
           .includes(q.toLowerCase()))
   );
+
 
   return (
     <section id="projects" className="relative bg-muted/40 py-24 sm:py-32">
@@ -342,15 +378,34 @@ export function Projects() {
                       View project <ArrowRight className="h-3 w-3" />
                     </span>
                   </div>
-                  <div className="absolute left-3 top-3">
+                  <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
                     <span className="inline-flex items-center rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-foreground backdrop-blur">
                       {p.category}
                     </span>
+                    {p.status && (
+                      <span className="inline-flex items-center rounded-full bg-primary/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur">
+                        {p.status}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="p-5">
                   <h3 className="font-semibold text-foreground">{p.title}</h3>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
+                  {p.contributions?.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {p.contributions.slice(0, 3).map((c) => (
+                        <span key={c} className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
+                          {c}
+                        </span>
+                      ))}
+                      {p.contributions.length > 3 && (
+                        <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
+                          +{p.contributions.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  )}
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     {p.languages.slice(0, 4).map((t) => (
                       <span key={t} className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
@@ -364,6 +419,7 @@ export function Projects() {
                     )}
                   </div>
                 </div>
+
               </motion.article>
             ))}
           </div>

@@ -1,10 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2, Pencil, LogOut, X, Upload, Mail, Users } from "lucide-react";
+import { Loader2, Plus, Trash2, Pencil, LogOut, X, Upload, Mail, Users, Tags } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
-import { fetchProjects, imageUrl, uploadProjectImage, type Project } from "@/lib/projects";
+import { fetchProjects, imageUrl, uploadProjectImage, CONTRIBUTION_OPTIONS, STATUS_OPTIONS, type Project } from "@/lib/projects";
+import { fetchCategories, type Category } from "@/lib/categories";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -24,6 +25,8 @@ type FormState = {
   id?: string;
   title: string;
   category: string;
+  status: string;
+  contributions: string[];
   description: string;
   author: string;
   client_name: string;
@@ -39,7 +42,9 @@ type FormState = {
 
 const empty: FormState = {
   title: "",
-  category: "Web",
+  category: "",
+  status: "",
+  contributions: [],
   description: "",
   author: "",
   client_name: "",
@@ -60,7 +65,7 @@ const label = "mb-1.5 block text-sm font-medium text-foreground";
 function AdminPage() {
   const { user, isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<"projects" | "messages" | "subscribers">("projects");
+  const [tab, setTab] = useState<"projects" | "categories" | "messages" | "subscribers">("projects");
 
   useEffect(() => {
     if (!loading && !user) void navigate({ to: "/auth" });
@@ -113,6 +118,7 @@ function AdminPage() {
         <div className="mx-auto flex max-w-7xl gap-1 px-4 pb-2 sm:px-6">
           {([
             ["projects", "Projects", Plus],
+            ["categories", "Categories", Tags],
             ["messages", "Messages", Mail],
             ["subscribers", "Subscribers", Users],
           ] as const).map(([k, lbl, Icon]) => (
@@ -131,6 +137,7 @@ function AdminPage() {
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
         {tab === "projects" && <ProjectsAdmin />}
+        {tab === "categories" && <CategoriesAdmin />}
         {tab === "messages" && <SimpleTable table="contact_messages" columns={["created_at", "name", "email", "company", "budget", "message"]} />}
         {tab === "subscribers" && <SimpleTable table="newsletter_subscribers" columns={["created_at", "email"]} />}
       </main>
@@ -204,6 +211,8 @@ function ProjectsAdmin() {
                         id: p.id,
                         title: p.title,
                         category: p.category,
+                        status: p.status ?? "",
+                        contributions: p.contributions ?? [],
                         description: p.description,
                         author: p.author ?? "",
                         client_name: p.client_name ?? "",
@@ -252,6 +261,13 @@ function ProjectForm({ value, onClose, onSaved }: { value: FormState; onClose: (
   const [f, setF] = useState<FormState>(value);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [cats, setCats] = useState<Category[]>([]);
+
+  useEffect(() => {
+    void fetchCategories({ includeDisabled: true }).then(setCats).catch(() => setCats([]));
+  }, []);
+
+
 
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setF((p) => ({ ...p, [k]: v }));
 
@@ -277,7 +293,9 @@ function ProjectForm({ value, onClose, onSaved }: { value: FormState; onClose: (
     setSaving(true);
     const payload = {
       title: f.title.trim().slice(0, 200),
-      category: f.category.trim() || "Web",
+      category: f.category.trim() || "Uncategorized",
+      status: f.status.trim() || null,
+      contributions: f.contributions,
       description: f.description.trim().slice(0, 4000),
       author: f.author.trim() || null,
       client_name: f.client_name.trim() || null,
@@ -320,9 +338,50 @@ function ProjectForm({ value, onClose, onSaved }: { value: FormState; onClose: (
             <input id="p-title" className={input} value={f.title} maxLength={200} onChange={(e) => set("title", e.target.value)} required />
           </div>
           <div>
-            <label className={label} htmlFor="p-cat">Category</label>
-            <input id="p-cat" className={input} value={f.category} maxLength={60} onChange={(e) => set("category", e.target.value)} placeholder="Web, SaaS, Mobile…" />
+            <label className={label} htmlFor="p-cat">Category (platform)</label>
+            <select id="p-cat" className={input} value={f.category} onChange={(e) => set("category", e.target.value)}>
+              <option value="">Select category…</option>
+              {cats.map((c) => (
+                <option key={c.id} value={c.name}>{c.name}{c.enabled ? "" : " (hidden)"}</option>
+              ))}
+              {f.category && !cats.some((c) => c.name === f.category) && <option value={f.category}>{f.category}</option>}
+            </select>
           </div>
+          <div>
+            <label className={label} htmlFor="p-status">Status</label>
+            <select id="p-status" className={input} value={f.status} onChange={(e) => set("status", e.target.value)}>
+              <option value="">No status</option>
+              {STATUS_OPTIONS.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
+          <div className="sm:col-span-2">
+            <span className={label}>Contributions (TechScalor's role)</span>
+            <div className="flex flex-wrap gap-2">
+              {CONTRIBUTION_OPTIONS.map((c) => {
+                const on = f.contributions.includes(c);
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() =>
+                      setF((p) => ({
+                        ...p,
+                        contributions: on ? p.contributions.filter((x) => x !== c) : [...p.contributions, c],
+                      }))
+                    }
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      on ? "border-transparent bg-gradient-brand text-white" : "border-border text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {c}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div>
             <label className={label} htmlFor="p-date">Date</label>
             <input id="p-date" type="date" className={input} value={f.project_date} onChange={(e) => set("project_date", e.target.value)} />
@@ -466,6 +525,113 @@ function SimpleTable({ table, columns }: { table: string; columns: string[] }) {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+function CategoriesAdmin() {
+  const [items, setItems] = useState<Category[]>([]);
+  const [busy, setBusy] = useState(true);
+  const [name, setName] = useState("");
+
+  const load = useCallback(async () => {
+    setBusy(true);
+    try {
+      setItems(await fetchCategories({ includeDisabled: true }));
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to load categories");
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const add = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const n = name.trim();
+    if (!n) return;
+    const { error } = await supabase.from("categories").insert({ name: n, sort_order: items.length + 1 });
+    if (error) return toast.error(error.message);
+    setName("");
+    toast.success("Category added");
+    void load();
+  };
+
+  const patch = async (c: Category, values: Partial<Category>) => {
+    const { error } = await supabase.from("categories").update(values).eq("id", c.id);
+    if (error) return toast.error(error.message);
+    void load();
+  };
+
+  const remove = async (c: Category) => {
+    if (!confirm(`Delete category "${c.name}"? Projects keep their existing label.`)) return;
+    const { error } = await supabase.from("categories").delete().eq("id", c.id);
+    if (error) return toast.error(error.message);
+    toast.success("Category deleted");
+    void load();
+  };
+
+  return (
+    <div>
+      <h1 className="mb-2 text-2xl font-bold text-foreground">Categories</h1>
+      <p className="mb-6 text-sm text-muted-foreground">
+        Add the platforms you build for (Websites, Mobile Apps, SaaS…). Disable one to hide it from the public site.
+      </p>
+
+      <form onSubmit={add} className="mb-6 flex flex-wrap gap-3">
+        <input
+          className={`${input} sm:max-w-xs`}
+          value={name}
+          maxLength={60}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="New category name"
+        />
+        <button type="submit" className="inline-flex items-center gap-1.5 rounded-full bg-gradient-brand px-5 py-2.5 text-sm font-semibold text-white shadow-glow">
+          <Plus className="h-4 w-4" /> Add
+        </button>
+      </form>
+
+      {busy ? (
+        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+      ) : items.length === 0 ? (
+        <p className="text-muted-foreground">No categories yet.</p>
+      ) : (
+        <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border">
+          {items.map((c) => (
+            <li key={c.id} className="flex flex-wrap items-center gap-3 bg-card px-4 py-3">
+              <input
+                className="min-w-0 flex-1 rounded-lg border border-transparent bg-transparent px-2 py-1 text-sm font-medium text-foreground hover:border-border focus:border-border focus:outline-none"
+                defaultValue={c.name}
+                maxLength={60}
+                onBlur={(e) => {
+                  const v = e.target.value.trim();
+                  if (v && v !== c.name) void patch(c, { name: v });
+                }}
+              />
+              <input
+                type="number"
+                aria-label={`Sort order for ${c.name}`}
+                className="w-20 rounded-lg border border-border bg-background px-2 py-1 text-sm"
+                defaultValue={c.sort_order}
+                onBlur={(e) => {
+                  const v = Number(e.target.value) || 0;
+                  if (v !== c.sort_order) void patch(c, { sort_order: v });
+                }}
+              />
+              <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                <input type="checkbox" className="h-4 w-4" checked={c.enabled} onChange={(e) => void patch(c, { enabled: e.target.checked })} />
+                Visible
+              </label>
+              <button onClick={() => void remove(c)} aria-label={`Delete ${c.name}`} className="text-destructive hover:opacity-70">
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

@@ -1,9 +1,32 @@
 import { supabase, PROJECT_BUCKET } from "./supabase";
 
+export const CONTRIBUTION_OPTIONS = [
+  "Full Development",
+  "Web Development",
+  "Mobile Development",
+  "UI/UX Design",
+  "Feature Development",
+  "Bug Fixes & Maintenance",
+  "Deployment & DevOps",
+  "Integration",
+  "Collaboration",
+  "AI Prototype",
+] as const;
+
+export const STATUS_OPTIONS = [
+  "Demo Project",
+  "Production Ready",
+  "Collaboration",
+  "In Progress",
+  "Prototype",
+] as const;
+
 export type Project = {
   id: string;
   title: string;
   category: string;
+  status: string | null;
+  contributions: string[];
   description: string;
   author: string | null;
   client_name: string | null;
@@ -17,6 +40,7 @@ export type Project = {
   sort_order: number;
   created_at: string;
 };
+
 
 export async function fetchProjects(opts?: { includeUnpublished?: boolean }) {
   let q = supabase.from("projects").select("*").order("sort_order", { ascending: true }).order("created_at", { ascending: false });
