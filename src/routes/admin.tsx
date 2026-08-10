@@ -293,7 +293,9 @@ function ProjectForm({ value, onClose, onSaved }: { value: FormState; onClose: (
     setSaving(true);
     const payload = {
       title: f.title.trim().slice(0, 200),
-      category: f.category.trim() || "Web",
+      category: f.category.trim() || "Uncategorized",
+      status: f.status.trim() || null,
+      contributions: f.contributions,
       description: f.description.trim().slice(0, 4000),
       author: f.author.trim() || null,
       client_name: f.client_name.trim() || null,
