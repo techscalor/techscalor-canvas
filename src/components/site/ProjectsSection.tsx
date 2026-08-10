@@ -378,15 +378,34 @@ export function Projects() {
                       View project <ArrowRight className="h-3 w-3" />
                     </span>
                   </div>
-                  <div className="absolute left-3 top-3">
+                  <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
                     <span className="inline-flex items-center rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-foreground backdrop-blur">
                       {p.category}
                     </span>
+                    {p.status && (
+                      <span className="inline-flex items-center rounded-full bg-primary/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur">
+                        {p.status}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="p-5">
                   <h3 className="font-semibold text-foreground">{p.title}</h3>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
+                  {p.contributions?.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {p.contributions.slice(0, 3).map((c) => (
+                        <span key={c} className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
+                          {c}
+                        </span>
+                      ))}
+                      {p.contributions.length > 3 && (
+                        <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
+                          +{p.contributions.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  )}
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     {p.languages.slice(0, 4).map((t) => (
                       <span key={t} className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
@@ -400,6 +419,7 @@ export function Projects() {
                     )}
                   </div>
                 </div>
+
               </motion.article>
             ))}
           </div>
