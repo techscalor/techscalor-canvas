@@ -172,11 +172,31 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
         {/* Overview */}
         <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-              {project.category}
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                {project.category}
+              </span>
+              {project.status && (
+                <span className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">
+                  {project.status}
+                </span>
+              )}
+            </div>
             <h3 className="mt-3 text-2xl font-bold text-foreground sm:text-3xl">{project.title}</h3>
+            {project.contributions?.length > 0 && (
+              <div className="mt-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Our contribution</p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {project.contributions.map((c) => (
+                    <span key={c} className="rounded-full border border-border bg-muted/60 px-2.5 py-1 text-[11px] font-semibold text-foreground">
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
             <p className="mt-4 whitespace-pre-line text-muted-foreground">{project.description}</p>
+
             {project.languages.length > 0 && (
               <div className="mt-5 flex flex-wrap gap-1.5">
                 {project.languages.map((t) => (
