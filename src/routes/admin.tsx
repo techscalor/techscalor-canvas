@@ -65,7 +65,7 @@ const label = "mb-1.5 block text-sm font-medium text-foreground";
 function AdminPage() {
   const { user, isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<"projects" | "messages" | "subscribers">("projects");
+  const [tab, setTab] = useState<"projects" | "categories" | "messages" | "subscribers">("projects");
 
   useEffect(() => {
     if (!loading && !user) void navigate({ to: "/auth" });
