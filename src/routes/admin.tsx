@@ -209,6 +209,8 @@ function ProjectsAdmin() {
                         id: p.id,
                         title: p.title,
                         category: p.category,
+                        status: p.status ?? "",
+                        contributions: p.contributions ?? [],
                         description: p.description,
                         author: p.author ?? "",
                         client_name: p.client_name ?? "",
