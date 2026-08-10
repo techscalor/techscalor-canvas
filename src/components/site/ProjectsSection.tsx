@@ -6,6 +6,7 @@ import {
   Calendar, User, MapPin, Loader2, PenLine,
 } from "lucide-react";
 import { fetchProjects, imageUrl, type Project } from "@/lib/projects";
+import { fetchCategories } from "@/lib/categories";
 
 /** In-memory cache so an image is only decoded/fetched once per session. */
 const imgCache = new Set<string>();
