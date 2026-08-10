@@ -528,3 +528,110 @@ function SimpleTable({ table, columns }: { table: string; columns: string[] }) {
     </div>
   );
 }
+
+function CategoriesAdmin() {
+  const [items, setItems] = useState<Category[]>([]);
+  const [busy, setBusy] = useState(true);
+  const [name, setName] = useState("");
+
+  const load = useCallback(async () => {
+    setBusy(true);
+    try {
+      setItems(await fetchCategories({ includeDisabled: true }));
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to load categories");
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const add = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const n = name.trim();
+    if (!n) return;
+    const { error } = await supabase.from("categories").insert({ name: n, sort_order: items.length + 1 });
+    if (error) return toast.error(error.message);
+    setName("");
+    toast.success("Category added");
+    void load();
+  };
+
+  const patch = async (c: Category, values: Partial<Category>) => {
+    const { error } = await supabase.from("categories").update(values).eq("id", c.id);
+    if (error) return toast.error(error.message);
+    void load();
+  };
+
+  const remove = async (c: Category) => {
+    if (!confirm(`Delete category "${c.name}"? Projects keep their existing label.`)) return;
+    const { error } = await supabase.from("categories").delete().eq("id", c.id);
+    if (error) return toast.error(error.message);
+    toast.success("Category deleted");
+    void load();
+  };
+
+  return (
+    <div>
+      <h1 className="mb-2 text-2xl font-bold text-foreground">Categories</h1>
+      <p className="mb-6 text-sm text-muted-foreground">
+        Add the platforms you build for (Websites, Mobile Apps, SaaS…). Disable one to hide it from the public site.
+      </p>
+
+      <form onSubmit={add} className="mb-6 flex flex-wrap gap-3">
+        <input
+          className={`${input} sm:max-w-xs`}
+          value={name}
+          maxLength={60}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="New category name"
+        />
+        <button type="submit" className="inline-flex items-center gap-1.5 rounded-full bg-gradient-brand px-5 py-2.5 text-sm font-semibold text-white shadow-glow">
+          <Plus className="h-4 w-4" /> Add
+        </button>
+      </form>
+
+      {busy ? (
+        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+      ) : items.length === 0 ? (
+        <p className="text-muted-foreground">No categories yet.</p>
+      ) : (
+        <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border">
+          {items.map((c) => (
+            <li key={c.id} className="flex flex-wrap items-center gap-3 bg-card px-4 py-3">
+              <input
+                className="min-w-0 flex-1 rounded-lg border border-transparent bg-transparent px-2 py-1 text-sm font-medium text-foreground hover:border-border focus:border-border focus:outline-none"
+                defaultValue={c.name}
+                maxLength={60}
+                onBlur={(e) => {
+                  const v = e.target.value.trim();
+                  if (v && v !== c.name) void patch(c, { name: v });
+                }}
+              />
+              <input
+                type="number"
+                aria-label={`Sort order for ${c.name}`}
+                className="w-20 rounded-lg border border-border bg-background px-2 py-1 text-sm"
+                defaultValue={c.sort_order}
+                onBlur={(e) => {
+                  const v = Number(e.target.value) || 0;
+                  if (v !== c.sort_order) void patch(c, { sort_order: v });
+                }}
+              />
+              <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                <input type="checkbox" className="h-4 w-4" checked={c.enabled} onChange={(e) => void patch(c, { enabled: e.target.checked })} />
+                Visible
+              </label>
+              <button onClick={() => void remove(c)} aria-label={`Delete ${c.name}`} className="text-destructive hover:opacity-70">
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
