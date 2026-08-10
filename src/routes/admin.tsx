@@ -118,6 +118,7 @@ function AdminPage() {
         <div className="mx-auto flex max-w-7xl gap-1 px-4 pb-2 sm:px-6">
           {([
             ["projects", "Projects", Plus],
+            ["categories", "Categories", Tags],
             ["messages", "Messages", Mail],
             ["subscribers", "Subscribers", Users],
           ] as const).map(([k, lbl, Icon]) => (
