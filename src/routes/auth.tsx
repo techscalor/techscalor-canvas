@@ -46,12 +46,16 @@ function AuthPage() {
     setBusy(true);
     try {
       if (mode === "register") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email: parsed.data.email,
           password: parsed.data.password,
         });
         if (error) throw error;
-        toast.success("Account created — you're signed in.");
+        if (data.session) {
+          toast.success("Account created — you're signed in.");
+        } else {
+          toast.error("Account created, but email confirmation is still turned on for this site. Ask the site owner to disable it.");
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: parsed.data.email,
