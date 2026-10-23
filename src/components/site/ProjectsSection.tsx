@@ -1,9 +1,10 @@
 import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import {
   ArrowRight, ChevronLeft, ChevronRight, X, Search, ExternalLink,
-  Calendar, User, MapPin, Loader2, PenLine,
+  Calendar, User, MapPin, Loader2, PenLine, ZoomIn, ZoomOut, RotateCcw,
 } from "lucide-react";
 import { fetchProjects, imageUrl, type Project } from "@/lib/projects";
 import { fetchCategories } from "@/lib/categories";
