@@ -125,7 +125,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
                   maxScale={6}
                   centerOnInit
                   centerZoomedOut
-                  doubleClick={{ mode: "zoom", step: 2 }}
+                  doubleClick={{ mode: "zoomIn", step: 2 }}
                   wheel={{ step: 0.2 }}
                   pinch={{ step: 5 }}
                   limitToBounds
