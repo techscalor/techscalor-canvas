@@ -89,7 +89,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
-      className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex overflow-y-auto bg-black/70 p-4 backdrop-blur-sm"
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 20 }}
@@ -97,7 +97,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
         exit={{ opacity: 0, scale: 0.96, y: 20 }}
         transition={{ type: "spring", stiffness: 260, damping: 26 }}
         onClick={(e) => e.stopPropagation()}
-        className="relative my-8 w-full max-w-5xl overflow-hidden rounded-3xl border border-border bg-card shadow-elevated"
+        className="relative m-auto w-full max-w-5xl overflow-hidden rounded-3xl border border-border bg-card shadow-elevated"
       >
         <button
           onClick={onClose}
