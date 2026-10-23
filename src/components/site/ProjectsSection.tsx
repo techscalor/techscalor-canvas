@@ -1,9 +1,10 @@
 import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import {
   ArrowRight, ChevronLeft, ChevronRight, X, Search, ExternalLink,
-  Calendar, User, MapPin, Loader2, PenLine,
+  Calendar, User, MapPin, Loader2, PenLine, ZoomIn, ZoomOut, RotateCcw,
 } from "lucide-react";
 import { fetchProjects, imageUrl, type Project } from "@/lib/projects";
 import { fetchCategories } from "@/lib/categories";
@@ -88,7 +89,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
-      className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex overflow-y-auto bg-black/70 p-4 backdrop-blur-sm"
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 20 }}
@@ -96,7 +97,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
         exit={{ opacity: 0, scale: 0.96, y: 20 }}
         transition={{ type: "spring", stiffness: 260, damping: 26 }}
         onClick={(e) => e.stopPropagation()}
-        className="relative my-8 w-full max-w-5xl overflow-hidden rounded-3xl border border-border bg-card shadow-elevated"
+        className="relative m-auto w-full max-w-5xl overflow-hidden rounded-3xl border border-border bg-card shadow-elevated"
       >
         <button
           onClick={onClose}
@@ -106,21 +107,70 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
           <X className="h-4 w-4" />
         </button>
 
-        {/* Slider */}
+        {/* Slider with zoom & pan (pinch on mobile, wheel/double-click on desktop) */}
         {slides.length > 0 && (
-          <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
+          <div className="relative aspect-[4/5] w-full overflow-hidden bg-muted sm:aspect-[16/9]">
             <AnimatePresence mode="wait">
-              <motion.img
+              <motion.div
                 key={slides[i]}
-                src={slides[i]}
-                alt={`${project.title} screenshot ${i + 1}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }}
-                decoding="async"
-                className="h-full w-full object-cover object-top"
-              />
+                className="absolute inset-0"
+              >
+                <TransformWrapper
+                  initialScale={1}
+                  minScale={1}
+                  maxScale={6}
+                  centerOnInit
+                  centerZoomedOut
+                  doubleClick={{ mode: "zoomIn", step: 2 }}
+                  wheel={{ step: 0.2 }}
+                  pinch={{ step: 5 }}
+                  limitToBounds
+                >
+                  {({ zoomIn, zoomOut, resetTransform }) => (
+                    <>
+                      <TransformComponent
+                        wrapperStyle={{ width: "100%", height: "100%" }}
+                        contentStyle={{ width: "100%", height: "100%" }}
+                      >
+                        <img
+                          src={slides[i]}
+                          alt={`${project.title} screenshot ${i + 1}`}
+                          draggable={false}
+                          decoding="async"
+                          className="h-full w-full select-none object-contain"
+                        />
+                      </TransformComponent>
+                      <div className="absolute bottom-3 right-3 z-10 flex gap-1.5">
+                        <button
+                          onClick={() => zoomOut()}
+                          aria-label="Zoom out"
+                          className="grid h-8 w-8 place-items-center rounded-full bg-black/50 text-white backdrop-blur transition-colors hover:bg-black/70"
+                        >
+                          <ZoomOut className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => zoomIn()}
+                          aria-label="Zoom in"
+                          className="grid h-8 w-8 place-items-center rounded-full bg-black/50 text-white backdrop-blur transition-colors hover:bg-black/70"
+                        >
+                          <ZoomIn className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => resetTransform()}
+                          aria-label="Reset zoom"
+                          className="grid h-8 w-8 place-items-center rounded-full bg-black/50 text-white backdrop-blur transition-colors hover:bg-black/70"
+                        >
+                          <RotateCcw className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </TransformWrapper>
+              </motion.div>
             </AnimatePresence>
 
             {slides.length > 1 && (
